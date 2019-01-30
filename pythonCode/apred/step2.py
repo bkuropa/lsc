@@ -171,7 +171,7 @@ for outerFold in compOuterFolds:
   
   savePrefix0="o"+'{0:04d}'.format(outerFold+1)
   savePrefix=savePath+savePrefix0
-  # if os.path.isfile(savePrefix+"."+finMark+".pckl") and (not continueComputations):
+  # if os.path.isfile(savePrefix+"."+finMark+".pckl") and (not continueComputations): # commented this out so we can restart code if need be
   #   continue
   saveFilename=savePrefix+"."+startMark+".pckl"
   # if os.path.isfile(saveFilename):
@@ -190,6 +190,7 @@ for outerFold in compOuterFolds:
   """
   
   
+  # hyperparameter selection based on val folds, a bit different from the original optimization procedure from Mayr et al
   
   # perfFiles=[]
   # takeMinibatch=[]

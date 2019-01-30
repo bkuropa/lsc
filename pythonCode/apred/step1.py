@@ -206,7 +206,7 @@ for paramNr in compParams:
       
       savePrefix0="o"+'{0:04d}'.format(outerFold+1)+"_i"+'{0:04d}'.format(innerFold+1)+"_p"+'{0:04d}'.format(hyperParams.index.values[paramNr])
       savePrefix=savePath+savePrefix0
-      # if os.path.isfile(savePrefix+"."+finMark+".pckl") and (not continueComputations):
+      # if os.path.isfile(savePrefix+"."+finMark+".pckl") and (not continueComputations): # commented this out so we can restart code if need be
       #   continue
       saveFilename=savePrefix+"."+startMark+".pckl"
       # if os.path.isfile(saveFilename):

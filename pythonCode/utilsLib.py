@@ -24,22 +24,23 @@ def prc_auc(targets, preds) -> float:
     precision, recall, _ = sklearn.metrics.precision_recall_curve(targets, preds)
     return sklearn.metrics.auc(recall, precision)
 
-def calculateAUCs(t, p, metric, scaler=None):
-  print('calculateAUCs')
-  metric_func = get_metric_func(metric)
-  aucs = []
-  for i in range(p.shape[1]):
-    if metric == 'auc' or metric == 'prc-auc': # classification
-      targ = t[:, i] > 0.5
-      pred = p[:, i]
-      idx = np.abs(t[:, i]) > 0.5
-    else:
-      targ, pred = t, p
-    try:
-      aucs.append(metric_func(targ[idx], pred[idx]))
-    except ValueError:
-      aucs.append(np.nan)
-  return aucs
+# unused in our version
+# def calculateAUCs(t, p, metric, scaler=None):
+#   print('calculateAUCs')
+#   metric_func = get_metric_func(metric)
+#   aucs = []
+#   for i in range(p.shape[1]):
+#     if metric == 'auc' or metric == 'prc-auc': # classification
+#       targ = t[:, i] > 0.5
+#       pred = p[:, i]
+#       idx = np.abs(t[:, i]) > 0.5
+#     else:
+#       targ, pred = t, p
+#     try:
+#       aucs.append(metric_func(targ[idx], pred[idx]))
+#     except ValueError:
+#       aucs.append(np.nan)
+#   return aucs
 
 def calculateSparseAUCs(t, p, metric, scaler=None):
   metric_func = get_metric_func(metric)

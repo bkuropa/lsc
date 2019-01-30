@@ -8,7 +8,7 @@ echo "Calling chembl script"
 rawDataDir=fingerprints
 sdfFile=$1
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )/.."
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )/.." # get path to current file
 
 mkdir $DIR/scripts/raw/$rawDataDir/SHED
 $DIR/lsc/chemblScript2.sh SHED ELEMENT_SYMBOL $DIR/scripts/sdfs/$sdfFile $DIR/scripts/raw/$rawDataDir/SHED chembl_id STRING_PATTERNS

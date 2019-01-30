@@ -7,7 +7,7 @@ batchSize=$4
 tfenv=$5
 val_epochs=('300')
 test_epochs=('300')
-cp_folds=('1' '2' '3' '4' '5' '6' '7' '8' '9' '10' '11' '12')
+cp_folds=('1' '2' '3' '4' '5' '6' '7' '8' '9' '10' '11' '12') # we just copy the initialization from fold_0 to all the others for time-saving and convenience
 val_folds=('0' '1' '2')
 test_folds=('3' '4' '5' '6' '7' '8' '9' '10' '11' '12')
 

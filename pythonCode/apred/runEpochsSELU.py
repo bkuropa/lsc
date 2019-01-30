@@ -95,8 +95,6 @@ for epoch in range(startEpoch, endEpoch):
         if not (sparseOutputData is None):
           predSparseTrain=trainSparseOutput.copy().astype(np.float32)
           predSparseTrain.data[:]=-1
-          # print('first max', predSparseTrain.data.max(), file=dbgOutput)
-          # print('first max', predSparseTrain.data.max())
         idxSamplesEval=[arr[1] for arr in sklearn.model_selection.KFold(n_splits=int(math.ceil(len(trainSamples)/batchSize)), shuffle=False).split(np.arange(len(trainSamples)))]
         for j in range(len(idxSamplesEval)):
           

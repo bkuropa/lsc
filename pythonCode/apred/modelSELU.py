@@ -177,11 +177,11 @@ with tf.variable_scope('layer_'+str(layernr)):
 
 
 if args.regression:
-  naMat=tf.where(yDenseData == 0, tf.zeros_like(yDenseData), tf.ones_like(yDenseData))
+  naMat=tf.where(yDenseData == 0, tf.zeros_like(yDenseData), tf.ones_like(yDenseData)) # 0 represents no data, shouldbe filtered out
   lossRawDense=((yDenseData-hiddenl) * (yDenseData-hiddenl)) * naMat # masked MSE
   errOverallDense=tf.reduce_mean(tf.reduce_sum(lossRawDense,1))+regRaw
   predNetworkDense=hiddenl
-  optimizerDense=tf.train.AdamOptimizer(learning_rate=1*lrGeneral).minimize(errOverallDense)
+  optimizerDense=tf.train.AdamOptimizer(learning_rate=1*lrGeneral).minimize(errOverallDense) # observed this worked better on regression
   # optimizerDense=tf.train.MomentumOptimizer(momentum=mom, learning_rate=lrGeneral).minimize(errOverallDense)
 
   hiddenlSelected=tf.gather_nd(hiddenl, yIndices)
@@ -189,10 +189,11 @@ if args.regression:
   lossRawSparse=tf.SparseTensor(indices=yIndices, values=lossRawSelected, dense_shape=yDim)
   errOverallSparse=tf.reduce_mean(tf.sparse_reduce_sum(lossRawSparse, 1))+regRaw
   predNetworkSparse=hiddenlSelected
-  optimizerSparse=tf.train.AdamOptimizer(learning_rate=1*lrGeneral).minimize(errOverallSparse)
+  optimizerSparse=tf.train.AdamOptimizer(learning_rate=1*lrGeneral).minimize(errOverallSparse) # observed this worked better on regression
   # optimizerSparse=tf.train.MomentumOptimizer(momentum=mom, learning_rate=lrGeneral).minimize(errOverallSparse)
+  predNetwork=hiddenl
 else:
-  naMat=tf.where(tf.abs(yDenseData) < 0.5, tf.zeros_like(yDenseData), tf.ones_like(yDenseData))
+  naMat=tf.where(tf.abs(yDenseData) < 0.5, tf.zeros_like(yDenseData), tf.ones_like(yDenseData)) # 0 represents no data, shouldbe filtered out
   lossRawDense=tf.nn.sigmoid_cross_entropy_with_logits(labels=(yDenseData+1.0)/2.0, logits=hiddenl)*naMat
   errOverallDense=tf.reduce_mean(tf.reduce_sum(lossRawDense,1))+regRaw
   predNetworkDense=tf.nn.sigmoid(hiddenl)
@@ -204,10 +205,6 @@ else:
   errOverallSparse=tf.reduce_mean(tf.sparse_reduce_sum(lossRawSparse, 1))+regRaw
   predNetworkSparse=tf.nn.sigmoid(hiddenlSelected)
   optimizerSparse=tf.train.MomentumOptimizer(momentum=mom, learning_rate=lrGeneral).minimize(errOverallSparse)
-
-if args.regression:
-  predNetwork=hiddenl
-else:
   predNetwork=tf.nn.sigmoid(hiddenl)
 
 class MyNoOp:
