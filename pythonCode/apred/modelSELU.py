@@ -176,20 +176,39 @@ with tf.variable_scope('layer_'+str(layernr)):
 
 
 
-naMat=tf.where(tf.abs(yDenseData) < 0.5, tf.zeros_like(yDenseData), tf.ones_like(yDenseData))
-lossRawDense=tf.nn.sigmoid_cross_entropy_with_logits(labels=(yDenseData+1.0)/2.0, logits=hiddenl)*naMat
-errOverallDense=tf.reduce_mean(tf.reduce_sum(lossRawDense,1))+regRaw
-predNetworkDense=tf.nn.sigmoid(hiddenl)
-optimizerDense=tf.train.MomentumOptimizer(momentum=mom, learning_rate=lrGeneral).minimize(errOverallDense)
+if args.regression:
+  naMat=tf.where(yDenseData == 0, tf.zeros_like(yDenseData), tf.ones_like(yDenseData))
+  lossRawDense=((yDenseData-hiddenl) * (yDenseData-hiddenl)) * naMat # masked MSE
+  errOverallDense=tf.reduce_mean(tf.reduce_sum(lossRawDense,1))+regRaw
+  predNetworkDense=hiddenl
+  optimizerDense=tf.train.AdamOptimizer(learning_rate=1*lrGeneral).minimize(errOverallDense)
+  # optimizerDense=tf.train.MomentumOptimizer(momentum=mom, learning_rate=lrGeneral).minimize(errOverallDense)
 
-hiddenlSelected=tf.gather_nd(hiddenl, yIndices)
-lossRawSelected=tf.nn.sigmoid_cross_entropy_with_logits(labels=(yValues+1.0)/2.0, logits=hiddenlSelected)
-lossRawSparse=tf.SparseTensor(indices=yIndices, values=lossRawSelected, dense_shape=yDim)
-errOverallSparse=tf.reduce_mean(tf.sparse_reduce_sum(lossRawSparse, 1))+regRaw
-predNetworkSparse=tf.nn.sigmoid(hiddenlSelected)
-optimizerSparse=tf.train.MomentumOptimizer(momentum=mom, learning_rate=lrGeneral).minimize(errOverallSparse)
+  hiddenlSelected=tf.gather_nd(hiddenl, yIndices)
+  lossRawSelected=((yValues-hiddenlSelected) * (yValues-hiddenlSelected))
+  lossRawSparse=tf.SparseTensor(indices=yIndices, values=lossRawSelected, dense_shape=yDim)
+  errOverallSparse=tf.reduce_mean(tf.sparse_reduce_sum(lossRawSparse, 1))+regRaw
+  predNetworkSparse=hiddenlSelected
+  optimizerSparse=tf.train.AdamOptimizer(learning_rate=1*lrGeneral).minimize(errOverallSparse)
+  # optimizerSparse=tf.train.MomentumOptimizer(momentum=mom, learning_rate=lrGeneral).minimize(errOverallSparse)
+else:
+  naMat=tf.where(tf.abs(yDenseData) < 0.5, tf.zeros_like(yDenseData), tf.ones_like(yDenseData))
+  lossRawDense=tf.nn.sigmoid_cross_entropy_with_logits(labels=(yDenseData+1.0)/2.0, logits=hiddenl)*naMat
+  errOverallDense=tf.reduce_mean(tf.reduce_sum(lossRawDense,1))+regRaw
+  predNetworkDense=tf.nn.sigmoid(hiddenl)
+  optimizerDense=tf.train.MomentumOptimizer(momentum=mom, learning_rate=lrGeneral).minimize(errOverallDense)
 
-predNetwork=tf.nn.sigmoid(hiddenl)
+  hiddenlSelected=tf.gather_nd(hiddenl, yIndices)
+  lossRawSelected=tf.nn.sigmoid_cross_entropy_with_logits(labels=(yValues+1.0)/2.0, logits=hiddenlSelected)
+  lossRawSparse=tf.SparseTensor(indices=yIndices, values=lossRawSelected, dense_shape=yDim)
+  errOverallSparse=tf.reduce_mean(tf.sparse_reduce_sum(lossRawSparse, 1))+regRaw
+  predNetworkSparse=tf.nn.sigmoid(hiddenlSelected)
+  optimizerSparse=tf.train.MomentumOptimizer(momentum=mom, learning_rate=lrGeneral).minimize(errOverallSparse)
+
+if args.regression:
+  predNetwork=hiddenl
+else:
+  predNetwork=tf.nn.sigmoid(hiddenl)
 
 class MyNoOp:
   op=tf.no_op()

@@ -29,7 +29,7 @@ gpu_options = tf.GPUOptions(allow_growth=True)
 import time
 import gc
 import argparse
-basePath=os.getenv("HOME")+"/mycode/pythonCode/"
+basePath='../'
 methodName="apred"
 methodPath=basePath+methodName+"/"
 utilsLib=imp.load_source(basePath+'utilsLib.py', basePath+"utilsLib.py")
@@ -49,16 +49,22 @@ pd.options.display.float_format = '{:.2f}'.format
 parser = argparse.ArgumentParser()
 parser.add_argument("-maxProc", help="Max. Nr. of Processes", type=int, default=3)
 parser.add_argument("-availableGPUs", help="Available GPUs", nargs='*', type=int, default=[0])
+parser.add_argument("-batchSize", help="batch size", type=int, default=128)
 parser.add_argument("-sizeFact", help="Size Factor GPU Scheduling", type=float, default=1.0)
 parser.add_argument("-originalData", help="Path for original data in python Format", type=str, default=os.getenv("HOME")+"/mydata/trgpred/chembl20/dataPythonReduced/")
+parser.add_argument("-dataPathFolds", help="Path to folds", type=str, default=os.getenv("HOME")+"/mydata/trgpred/chembl20/dataPythonReduced/")
 parser.add_argument("-dataset", help="Dataset Name", type=str, default="ecfp")
+parser.add_argument("-metric", help="metric", type=str, default="auc")
 parser.add_argument("-saveBasePath", help="saveBasePath", type=str, default=os.getenv("HOME")+"/mydata/trgpred/chembl20/resPython/")
-parser.add_argument("-ofolds", help="Outer Folds", nargs='+', type=int, default=[0,1,2])
+parser.add_argument("-ofolds", help="Outer Folds", nargs='+', type=int, default=[2])
+parser.add_argument("-regression", help="regression labels", action='store_true')
 parser.add_argument("-continueComputations", help="continueComputations", action='store_true')
 parser.add_argument("-saveComputations", help="saveComputations", action='store_true')
 parser.add_argument("-startMark", help="startMark", type=str, default="start")
 parser.add_argument("-finMark", help="finMark", type=str, default="finished")
 parser.add_argument("-epochs", help="Nr. Epochs", type=int, default=300)
+parser.add_argument("-noOpt", help="no hyperparam optimization", action='store_true')
+parser.add_argument("-valBasePath", help="separate val save path for reusing best hyperparams", type=str)
 args = parser.parse_args()
 
 
@@ -68,12 +74,14 @@ availableGPUs=args.availableGPUs
 sizeFact=args.sizeFact
 
 dataPathSave=args.originalData
+dataPathFolds=args.dataPathFolds
 
 datasetName=args.dataset
 saveBasePath=args.saveBasePath
 if not os.path.exists(saveBasePath):
   os.makedirs(saveBasePath)
 savePath=saveBasePath+datasetName+"/"
+valSavePath=args.valBasePath+datasetName+"/" if args.valBasePath else savePath
 if not os.path.exists(savePath):
   os.makedirs(savePath)  
 dbgPath=savePath+"dbg/"
@@ -88,7 +96,7 @@ startMark=args.startMark
 finMark=args.finMark
 
 nrEpochs=args.epochs
-batchSize=128
+batchSize=args.batchSize
 
 
 
@@ -154,18 +162,20 @@ for outerFold in compOuterFolds:
   
   
   
-  if len(availableGPUs)>0.5:
-    os.environ['CUDA_VISIBLE_DEVICES'] = str(availableGPUs[usedGPUDeviceAlloc])
+  # if len(availableGPUs)>0.5:
+  #   os.environ['CUDA_VISIBLE_DEVICES'] = str(availableGPUs[usedGPUDeviceAlloc])
+  os.environ['CUDA_VISIBLE_DEVICES'] = str(availableGPUs[0])
+  print('CUDA_VISIBLE_DEVICES:{}'.format(os.environ['CUDA_VISIBLE_DEVICES']))
   
   
   
   savePrefix0="o"+'{0:04d}'.format(outerFold+1)
   savePrefix=savePath+savePrefix0
-  if os.path.isfile(savePrefix+"."+finMark+".pckl") and (not continueComputations):
-    continue
+  # if os.path.isfile(savePrefix+"."+finMark+".pckl") and (not continueComputations):
+  #   continue
   saveFilename=savePrefix+"."+startMark+".pckl"
-  if os.path.isfile(saveFilename):
-    continue
+  # if os.path.isfile(saveFilename):
+  #   continue
   saveFile=open(saveFilename, "wb")
   startNr=0
   pickle.dump(startNr, saveFile)
@@ -181,26 +191,59 @@ for outerFold in compOuterFolds:
   
   
   
-  perfFiles=[]
-  takeMinibatch=[]
-  for innerFold in range(0, len(folds)):
-    if innerFold==outerFold:
-      continue
-    perfFiles.append([])
-    for paramNr in range(0, hyperParams.shape[0]):
-      perfFiles[-1].append(savePath+"o"+'{0:04d}'.format(outerFold+1)+"_i"+'{0:04d}'.format(innerFold+1)+"_p"+'{0:04d}'.format(hyperParams.index.values[paramNr])+".test.auc.pckl")
+  # perfFiles=[]
+  # takeMinibatch=[]
+  # for innerFold in range(0, len(folds)):
+  #   if innerFold==outerFold:
+  #     continue
+  #   perfFiles.append([])
+  #   for paramNr in range(0, hyperParams.shape[0]):
+  #     perfFiles[-1].append(savePath+"o"+'{0:04d}'.format(outerFold+1)+"_i"+'{0:04d}'.format(innerFold+1)+"_p"+'{0:04d}'.format(hyperParams.index.values[paramNr])+".test.auc.pckl")
     
-    if outerFold<0:
-      compNrMinibatches=float(nrEpochs)*math.ceil(float(len(list(set(allSamples)-set(folds[innerFold]))))/float(batchSize))
-    else:
-      compNrMinibatches=float(nrEpochs)*math.ceil(float(len(list(set(allSamples)-set(folds[innerFold]+folds[outerFold]))))/float(batchSize))
-    compLastMinibatch=math.trunc(compNrMinibatches/minibatchesPerReportTest)-1
-    takeMinibatch.append(compLastMinibatch)
+  #   if outerFold<0:
+  #     compNrMinibatches=float(nrEpochs)*math.ceil(float(len(list(set(allSamples)-set(folds[innerFold]))))/float(batchSize))
+  #   else:
+  #     compNrMinibatches=float(nrEpochs)*math.ceil(float(len(list(set(allSamples)-set(folds[innerFold]+folds[outerFold]))))/float(batchSize))
+  #   compLastMinibatch=math.trunc(compNrMinibatches/minibatchesPerReportTest)-1
+  #   takeMinibatch.append(compLastMinibatch)
     
-  paramNr, perfTable, perfTableOrig=utilsLib.bestSettingsSimple(perfFiles, hyperParams.shape[0], takeMinibatch)
-  print(hyperParams.iloc[paramNr], file=dbgOutput)
-  
-  
+  # paramNr, perfTable, perfTableOrig=utilsLib.bestSettingsSimple(perfFiles, hyperParams.shape[0], takeMinibatch)
+  # print(hyperParams.iloc[paramNr], file=dbgOutput)
+
+  if args.noOpt:
+    paramNr = 0
+  else:
+    best_auc = 0
+    if args.regression:
+      best_auc = 1e6
+    best_hp = -1
+    for hp in range(40):
+      index = str(hp)
+      if len(index) == 1:
+        index = '0' + index
+      val_aucs = []
+      for val_idx in range(3):
+        with open(os.path.join(valSavePath, '../..', 'fold_' + str(val_idx), 'semi', 'dbg', 'o0003_i0002_p00' + index + '.dbg'), 'r') as f:
+          last_line = None
+          for line in f:
+            if len(line.strip()) > 0:
+              last_line = line.strip()
+          try:
+            auc = float(last_line)
+          except:
+            print('invalid auc')
+            if args.regression:
+              auc = 1e6
+            else:
+              auc = .5
+          val_aucs.append(auc)
+      avg_auc = sum(val_aucs)/len(val_aucs)
+      if (args.regression and avg_auc < best_auc) or (not args.regression and avg_auc > best_auc):
+        best_auc, best_hp = avg_auc, hp
+    paramNr = best_hp
+    
+  innerFold = 1 # always 1 for us
+  print(paramNr)
   
   if outerFold<0:
     trainSamples=list(set(allSamples))

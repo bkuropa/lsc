@@ -19,7 +19,7 @@ gpu_options = tf.GPUOptions(allow_growth=True)
 import time
 import gc
 import argparse
-basePath=os.getenv("HOME")+"/mycode/pythonCode/"
+basePath='../'
 
 #np.set_printoptions(threshold='nan')
 np.set_printoptions(threshold=1000)
@@ -34,10 +34,14 @@ pd.options.display.float_format = '{:.2f}'.format
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-availableGPU", help="GPU for Test", type=int, default=0)
+parser.add_argument("-batchSize", help="batch size", type=int, default=128)
 parser.add_argument("-methodName", help="Method name", type=str, default="apred")
 parser.add_argument("-originalData", help="Path for original data in python Format", type=str, default=os.getenv("HOME")+"/mydata/trgpred/chembl20/dataPythonReduced/")
+parser.add_argument("-dataPathFolds", help="Path to folds", type=str, default=os.getenv("HOME")+"/mydata/trgpred/chembl20/dataPythonReduced/")
 parser.add_argument("-datasetNames", help="DatasetNames", nargs='+', type=str, default=["static", "semi", "ecfp", "dfs", "ecfpTox"])
 parser.add_argument("-saveBasePath", help="saveBasePath", type=str, default=os.getenv("HOME")+"/mydata/trgpred/chembl20/resPython/")
+parser.add_argument("-regression", help="regression labels", action='store_true')
+parser.add_argument("-metric", help="metric", type=str, default="auc")
 args = parser.parse_args()
 
 
@@ -50,6 +54,7 @@ utilsLib=imp.load_source(basePath+'utilsLib.py', basePath+"utilsLib.py")
 actLib=imp.load_source(basePath+'actLib.py', basePath+"actLib.py")
 
 dataPathSave=args.originalData
+dataPathFolds=args.dataPathFolds
 
 datasetNames=args.datasetNames
 
@@ -71,7 +76,7 @@ for datasetName in datasetNames:
   if not os.path.exists(savePath):
     os.makedirs(savePath)
 
-  batchSize=128
+  batchSize=args.batchSize
 
 
 

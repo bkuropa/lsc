@@ -60,7 +60,7 @@ for j in range(len(idxSamplesEval)):
 if useDenseOutputNetPred:
   predDenseTrain=np.vstack(predDenseTrain)
   if compPerformanceTrain:
-    sumTrainAUC=np.array(utilsLib.calculateAUCs(trainDenseOutput, predDenseTrain))
+    sumTrainAUC=np.array(utilsLib.calculateAUCs(trainDenseOutput, predDenseTrain, args.metric, targetScaler if args.regression else None))
     sumTrainAP=np.array(utilsLib.calculateAPs(trainDenseOutput, predDenseTrain))
 
 if not useDenseOutputNetPred:
@@ -68,7 +68,7 @@ if not useDenseOutputNetPred:
     predSparseTrainTransposed=predSparseTrain.T.tocsr()
     predSparseTrain=None
     predSparseTrainTransposed.sort_indices()
-    sumTrainAUC=np.array(utilsLib.calculateSparseAUCs(trainSparseOutputTransposed, predSparseTrainTransposed))
+    sumTrainAUC=np.array(utilsLib.calculateSparseAUCs(trainSparseOutputTransposed, predSparseTrainTransposed, args.metric, targetScaler if args.regression else None))
     sumTrainAP=np.array(utilsLib.calculateSparseAPs(trainSparseOutputTransposed, predSparseTrainTransposed))
     predSparseTrainTransposed=None
 
@@ -121,7 +121,7 @@ for j in range(len(idxSamplesEval)):
 predDenseTest=np.vstack(predDenseTest)
 if useDenseOutputNetPred:
   if compPerformanceTest:
-    sumTestAUC=np.array(utilsLib.calculateAUCs(testDenseOutput, predDenseTest))
+    sumTestAUC=np.array(utilsLib.calculateAUCs(testDenseOutput, predDenseTest, args.metric, targetScaler if args.regression else None))
     sumTestAP=np.array(utilsLib.calculateAPs(testDenseOutput, predDenseTest))
 
 if not useDenseOutputNetPred:
@@ -129,7 +129,7 @@ if not useDenseOutputNetPred:
     predSparseTestTransposed=predSparseTest.copy().T.tocsr()
     predSparseTest=None
     predSparseTestTransposed.sort_indices()
-    sumTestAUC=np.array(utilsLib.calculateSparseAUCs(testSparseOutputTransposed, predSparseTestTransposed))
+    sumTestAUC=np.array(utilsLib.calculateSparseAUCs(testSparseOutputTransposed, predSparseTestTransposed, args.metric, targetScaler if args.regression else None))
     sumTestAP=np.array(utilsLib.calculateSparseAPs(testSparseOutputTransposed, predSparseTestTransposed))
     predSparseTestTransposed=None
 

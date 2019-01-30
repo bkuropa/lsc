@@ -29,7 +29,7 @@ gpu_options = tf.GPUOptions(allow_growth=True)
 import time
 import gc
 import argparse
-basePath=os.getenv("HOME")+"/mycode/pythonCode/"
+basePath='../'
 methodName="apred"
 methodPath=basePath+methodName+"/"
 utilsLib=imp.load_source(basePath+'utilsLib.py', basePath+"utilsLib.py")
@@ -49,14 +49,18 @@ pd.options.display.float_format = '{:.2f}'.format
 parser = argparse.ArgumentParser()
 parser.add_argument("-maxProc", help="Max. Nr. of Processes", type=int, default=10)
 parser.add_argument("-availableGPUs", help="Available GPUs", nargs='*', type=int, default=[0])
+parser.add_argument("-batchSize", help="batch size", type=int, default=128)
 parser.add_argument("-sizeFact", help="Size Factor GPU Scheduling", type=float, default=1.0)
 parser.add_argument("-originalData", help="Path for original data in python Format", type=str, default=os.getenv("HOME")+"/mydata/trgpred/chembl20/dataPythonReduced/")
+parser.add_argument("-dataPathFolds", help="Path to folds", type=str, default=os.getenv("HOME")+"/mydata/trgpred/chembl20/dataPythonReduced/")
 parser.add_argument("-dataset", help="Dataset Name", type=str, default="ecfp")
+parser.add_argument("-metric", help="metric", type=str, default="auc")
 parser.add_argument("-saveBasePath", help="saveBasePath", type=str, default=os.getenv("HOME")+"/mydata/trgpred/chembl20/resPython/")
-parser.add_argument("-ofolds", help="Outer Folds", nargs='+', type=int, default=[0,1,2])
-parser.add_argument("-ifolds", help="Inner Folds", nargs='+', type=int, default=[0,1,2])
+parser.add_argument("-ofolds", help="Outer Folds", nargs='+', type=int, default=[2]) # test
+parser.add_argument("-ifolds", help="Inner Folds", nargs='+', type=int, default=[1]) # val
 parser.add_argument("-pStart", help="Parameter Start Index", type=int, default=0)
 parser.add_argument("-pEnd", help="Parameter End Index", type=int, default=40)
+parser.add_argument("-regression", help="regression labels", action='store_true')
 parser.add_argument("-continueComputations", help="continueComputations", action='store_true')
 parser.add_argument("-saveComputations", help="saveComputations", action='store_true')
 parser.add_argument("-startMark", help="startMark", type=str, default="start")
@@ -71,6 +75,7 @@ availableGPUs=args.availableGPUs
 sizeFact=args.sizeFact
 
 dataPathSave=args.originalData
+dataPathFolds=args.dataPathFolds
 
 datasetName=args.dataset
 saveBasePath=args.saveBasePath
@@ -95,7 +100,7 @@ startMark=args.startMark
 finMark=args.finMark
 
 nrEpochs=args.epochs
-batchSize=128
+batchSize=args.batchSize
 
 
 
@@ -185,8 +190,10 @@ for paramNr in compParams:
   
   
   
-  if len(availableGPUs)>0.5:
-    os.environ['CUDA_VISIBLE_DEVICES'] = str(availableGPUs[usedGPUDeviceAlloc])
+  # if len(availableGPUs)>0.5:
+  #   os.environ['CUDA_VISIBLE_DEVICES'] = str(availableGPUs[usedGPUDeviceAlloc])
+  os.environ['CUDA_VISIBLE_DEVICES'] = str(availableGPUs[0])
+  print('CUDA_VISIBLE_DEVICES:{}'.format(os.environ['CUDA_VISIBLE_DEVICES']))
   
   
   
@@ -199,11 +206,11 @@ for paramNr in compParams:
       
       savePrefix0="o"+'{0:04d}'.format(outerFold+1)+"_i"+'{0:04d}'.format(innerFold+1)+"_p"+'{0:04d}'.format(hyperParams.index.values[paramNr])
       savePrefix=savePath+savePrefix0
-      if os.path.isfile(savePrefix+"."+finMark+".pckl") and (not continueComputations):
-        continue
+      # if os.path.isfile(savePrefix+"."+finMark+".pckl") and (not continueComputations):
+      #   continue
       saveFilename=savePrefix+"."+startMark+".pckl"
-      if os.path.isfile(saveFilename):
-        continue
+      # if os.path.isfile(saveFilename):
+      #   continue
       saveFile=open(saveFilename, "wb")
       startNr=0
       pickle.dump(startNr, saveFile)

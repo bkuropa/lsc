@@ -8,26 +8,53 @@ import sklearn
 import sklearn.metrics
 import pickle
 import pandas as pd
+import math
 
-def calculateAUCs(t, p):
+def get_metric_func(metric='auc'):
+  if metric == 'auc':
+    return sklearn.metrics.roc_auc_score
+  if metric == 'rmse':
+    return lambda targ, pred: math.sqrt(sklearn.metrics.mean_squared_error(targ, pred))
+  if metric == 'mae':
+    return sklearn.metrics.mean_absolute_error
+  if metric == 'prc-auc': 
+    return prc_auc
+
+def prc_auc(targets, preds) -> float:
+    precision, recall, _ = sklearn.metrics.precision_recall_curve(targets, preds)
+    return sklearn.metrics.auc(recall, precision)
+
+def calculateAUCs(t, p, metric, scaler=None):
+  print('calculateAUCs')
+  metric_func = get_metric_func(metric)
   aucs = []
   for i in range(p.shape[1]):
-    targ = t[:, i] > 0.5
-    pred = p[:, i]
-    idx = np.abs(t[:, i]) > 0.5
+    if metric == 'auc' or metric == 'prc-auc': # classification
+      targ = t[:, i] > 0.5
+      pred = p[:, i]
+      idx = np.abs(t[:, i]) > 0.5
+    else:
+      targ, pred = t, p
     try:
-      aucs.append(sklearn.metrics.roc_auc_score(targ[idx], pred[idx]))
+      aucs.append(metric_func(targ[idx], pred[idx]))
     except ValueError:
       aucs.append(np.nan)
   return aucs
 
-def calculateSparseAUCs(t, p):
+def calculateSparseAUCs(t, p, metric, scaler=None):
+  metric_func = get_metric_func(metric)
   aucs = []
+  # print(p.shape) # num tasks x num data
   for i in range(p.shape[0]):
-    targ = t[i].data > 0.5
-    pred = p[i].data
+    if metric == 'auc' or metric == 'prc-auc': # classification
+      targ = t[i].data > 0.5
+      pred = p[i].data
+    else:
+      targ, pred = t[i].data, p[i].data
+      targ = scaler.inverse_transform_index(targ, i)
+      pred = scaler.inverse_transform_index(pred, i)
     try:
-      aucs.append(sklearn.metrics.roc_auc_score(targ, pred))
+      aucs.append(metric_func(targ, pred))
     except ValueError:
       aucs.append(np.nan)
   return aucs
@@ -35,6 +62,8 @@ def calculateSparseAUCs(t, p):
 def calculateAPs(t, p):
   aucs = []
   for i in range(p.shape[1]):
+    aucs.append(0.5) # we aren't going to use the AP number anywhere so just continue to avoid any crashes
+    continue
     targ = t[:, i] > 0.5
     pred = p[:, i]
     idx = np.abs(t[:, i]) > 0.5
@@ -50,6 +79,8 @@ def calculateAPs(t, p):
 def calculateSparseAPs(t, p):
   aucs = []
   for i in range(p.shape[0]):
+    aucs.append(0.5) # we aren't going to use the AP number anywhere so just continue to avoid any crashes
+    continue
     targ = t[i].data > 0.5
     pred = p[i].data
     try:

@@ -137,7 +137,7 @@ for epoch in range(startEpoch, endEpoch):
         if useDenseOutputNetPred:
           predDenseTrain=np.vstack(predDenseTrain)
           if compPerformanceTrain:
-            sumTrainAUC=np.array(utilsLib.calculateAUCs(trainDenseOutput, predDenseTrain))
+            sumTrainAUC=np.array(utilsLib.calculateAUCs(trainDenseOutput, predDenseTrain, args.metric, targetScaler if args.regression else None))
             sumTrainAP=np.array(utilsLib.calculateAPs(trainDenseOutput, predDenseTrain))
         
         if not useDenseOutputNetPred:
@@ -145,7 +145,7 @@ for epoch in range(startEpoch, endEpoch):
             predSparseTrainTransposed=predSparseTrain.T.tocsr()
             predSparseTrain=None
             predSparseTrainTransposed.sort_indices()
-            sumTrainAUC=np.array(utilsLib.calculateSparseAUCs(trainSparseOutputTransposed, predSparseTrainTransposed))
+            sumTrainAUC=np.array(utilsLib.calculateSparseAUCs(trainSparseOutputTransposed, predSparseTrainTransposed, args.metric, targetScaler if args.regression else None))
             sumTrainAP=np.array(utilsLib.calculateSparseAPs(trainSparseOutputTransposed, predSparseTrainTransposed))
             predSparseTrainTransposed=None
         
@@ -227,7 +227,7 @@ for epoch in range(startEpoch, endEpoch):
         if useDenseOutputNetPred:
           predDenseTest=np.vstack(predDenseTest)
           if compPerformanceTest:
-            sumTestAUC=np.array(utilsLib.calculateAUCs(testDenseOutput, predDenseTest))
+            sumTestAUC=np.array(utilsLib.calculateAUCs(testDenseOutput, predDenseTest, args.metric, targetScaler if args.regression else None))
             sumTestAP=np.array(utilsLib.calculateAPs(testDenseOutput, predDenseTest))
           if savePredictionsAtBestIter:
             predDenseBestIter[:, bestIterPerTask>=minibatchReportNr]=predDenseTest[:, bestIterPerTask>=minibatchReportNr]
@@ -243,7 +243,7 @@ for epoch in range(startEpoch, endEpoch):
             predSparseTestTransposed=predSparseTest.copy().T.tocsr()
             predSparseTest=None
             predSparseTestTransposed.sort_indices()
-            sumTestAUC=np.array(utilsLib.calculateSparseAUCs(testSparseOutputTransposed, predSparseTestTransposed))
+            sumTestAUC=np.array(utilsLib.calculateSparseAUCs(testSparseOutputTransposed, predSparseTestTransposed, args.metric, targetScaler if args.regression else None))
             sumTestAP=np.array(utilsLib.calculateSparseAPs(testSparseOutputTransposed, predSparseTestTransposed))
             predSparseTestTransposed=None
         

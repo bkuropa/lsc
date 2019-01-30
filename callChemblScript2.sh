@@ -3,25 +3,25 @@
 #Copyright (C) 2018 Andreas Mayr
 #Licensed under GNU General Public License v3.0 (see http://www.bioinf.jku.at/research/lsc/LICENSE and https://github.com/ml-jku/lsc/blob/master/LICENSE)
 
+echo "Calling chembl script"
+
+rawDataDir=fingerprints
+sdfFile=$1
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )/.."
+
+mkdir $DIR/scripts/raw/$rawDataDir/SHED
+$DIR/lsc/chemblScript2.sh SHED ELEMENT_SYMBOL $DIR/scripts/sdfs/$sdfFile $DIR/scripts/raw/$rawDataDir/SHED chembl_id STRING_PATTERNS
+
+mkdir $DIR/scripts/raw/$rawDataDir/CATS2D
+$DIR/lsc/chemblScript2.sh CATS2D ELEMENT_SYMBOL $DIR/scripts/sdfs/$sdfFile $DIR/scripts/raw/$rawDataDir/CATS2D chembl_id STRING_PATTERNS
 
 
-rawDataDir=chembl20
-sdfFile=chembl_20.sdf
 
 
 
-mkdir $HOME/mydata/raw/$rawDataDir/SHED
-$HOME/mycode/chemblScript2.sh SHED ELEMENT_SYMBOL $HOME/mydata/raw/$rawDataDir/$sdfFile $HOME/mydata/raw/$rawDataDir/SHED chembl_id STRING_PATTERNS
-
-mkdir $HOME/mydata/raw/$rawDataDir/CATS2D
-$HOME/mycode/chemblScript2.sh CATS2D ELEMENT_SYMBOL $HOME/mydata/raw/$rawDataDir/$sdfFile $HOME/mydata/raw/$rawDataDir/CATS2D chembl_id STRING_PATTERNS
-
-
-
-
-
-dirName=$HOME/mydata/raw/$rawDataDir/SHED
-outFile=SHED_ES.fpf
+dirName=$DIR/scripts/raw/$rawDataDir/SHED
+outFile=$2
 
 rm $dirName/../$outFile
 for i in `ls $dirName/myout*.res`; do
@@ -31,8 +31,8 @@ done
 
 
 
-dirName=$HOME/mydata/raw/$rawDataDir/CATS2D
-outFile=CATS2D_ES.fpf
+dirName=$DIR/scripts/raw/$rawDataDir/CATS2D
+outFile=$3
 
 rm $dirName/../$outFile
 for i in `ls $dirName/myout*.res`; do

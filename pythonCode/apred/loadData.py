@@ -10,19 +10,92 @@ import scipy.sparse
 import pickle
 from sklearn.feature_selection import VarianceThreshold
 
+from typing import List
 
+class StandardScaler:
+  def __init__(self, means: np.ndarray = None, stds: np.ndarray = None, replace_nan_token=None):
+    """Initialize StandardScaler, optionally with means and standard deviations precomputed."""
+    self.means = means
+    self.stds = stds
+    self.replace_nan_token = replace_nan_token
 
-f=open(dataPathSave+'folds0.pckl', "rb")
+  def fit(self, X: List[List[float]]) -> 'StandardScaler':
+    """
+    Learns means and standard deviations across the 0-th axis.
+
+    :param X: A list of lists of floats.
+    :return: The fitted StandardScaler.
+    """
+    X = X.todense()
+    X = np.array(X).astype(float)
+    X = np.where(X==0, np.ones(X.shape) * float('nan'), X)
+    self.means = np.nanmean(X, axis=0)
+    self.stds = np.nanstd(X, axis=0)
+    self.means = np.where(np.isnan(self.means), np.zeros(self.means.shape), self.means)
+    self.stds = np.where(np.isnan(self.stds), np.ones(self.stds.shape), self.stds)
+    self.stds = np.where(self.stds == 0, np.ones(self.stds.shape), self.stds)
+
+    return self
+
+  def transform(self, X: List[List[float]]):
+    """
+    Transforms the data by subtracting the means and dividing by the standard deviations.
+
+    :param X: A list of lists of floats.
+    :return: The transformed data.
+    """
+    X = X.todense()
+    X = np.array(X).astype(float)
+    X = np.where(X==0, np.ones(X.shape) * float('nan'), X)
+    transformed_with_nan = (X - self.means) / self.stds
+    transformed_with_none = np.where(np.isnan(transformed_with_nan), 0, transformed_with_nan)
+
+    return transformed_with_none
+
+  def inverse_transform(self, X: List[List[float]]):
+    """
+    Performs the inverse transformation by multiplying by the standard deviations and adding the means.
+
+    :param X: A list of lists of floats.
+    :return: The inverse transformed data.
+    """
+    X = np.array(X).astype(float)
+    X = np.where(X==0, np.ones(X.shape) * float('nan'), X)
+    transformed_with_nan = X * self.stds + self.means
+    transformed_with_none = np.where(np.isnan(transformed_with_nan), 0, transformed_with_nan)
+
+    return transformed_with_none
+  
+  def inverse_transform_index(self, X: List[List[float]], i: int):
+    """
+    Performs the inverse transformation by multiplying by the standard deviations and adding the means.
+
+    :param X: A list of lists of floats.
+    :return: The inverse transformed data.
+    """
+    X = np.array(X).astype(float)
+    X = np.where(X==0, np.ones(X.shape) * float('nan'), X)
+    transformed_with_nan = X * self.stds[i] + self.means[i]
+    transformed_with_none = np.where(np.isnan(transformed_with_nan), 0, transformed_with_nan)
+
+    return transformed_with_none
+
+f=open(dataPathFolds, "rb")
 folds=pickle.load(f)
 f.close()
 
-f=open(dataPathSave+'labelsHard.pckl', "rb")
+f=open(dataPathSave + 'labelsHard.pckl', "rb")
 targetMat=pickle.load(f)
 sampleAnnInd=pickle.load(f)
 targetAnnInd=pickle.load(f)
 f.close()
 
 targetMat=targetMat
+if args.regression:
+  originalTargetMat=targetMat
+  targetScaler=StandardScaler()
+  targetScaler.fit(targetMat)
+  targetMat=scipy.sparse.csr_matrix(targetScaler.transform(targetMat))
 targetMat=targetMat.copy().tocsr()
 targetMat.sort_indices()
 targetAnnInd=targetAnnInd
