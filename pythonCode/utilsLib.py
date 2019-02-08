@@ -15,6 +15,8 @@ def get_metric_func(metric='auc'):
     return sklearn.metrics.roc_auc_score
   if metric == 'rmse':
     return lambda targ, pred: math.sqrt(sklearn.metrics.mean_squared_error(targ, pred))
+  if metric == 'r2':
+    return sklearn.metrics.r2_score
   if metric == 'mae':
     return sklearn.metrics.mean_absolute_error
   if metric == 'prc-auc': 
