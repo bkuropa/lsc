@@ -199,8 +199,8 @@ for paramNr in compParams:
   
   for outerFold in compOuterFolds:
     for innerFold in compInnerFolds:
-      if innerFold==outerFold:
-        continue
+      # if innerFold==outerFold: # during hyperopt, we should use inner = outer (val set)
+      #   continue
       
       
       
