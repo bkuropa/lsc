@@ -56,7 +56,7 @@ parser.add_argument("-dataPathFolds", help="Path to folds", type=str, default=os
 parser.add_argument("-dataset", help="Dataset Name", type=str, default="ecfp")
 parser.add_argument("-metric", help="metric", type=str, default="auc")
 parser.add_argument("-saveBasePath", help="saveBasePath", type=str, default=os.getenv("HOME")+"/mydata/trgpred/chembl20/resPython/")
-parser.add_argument("-ofolds", help="Outer Folds", nargs='+', type=int, default=[2]) # test
+parser.add_argument("-ofolds", help="Outer Folds", nargs='+', type=int, default=[1]) # test
 parser.add_argument("-ifolds", help="Inner Folds", nargs='+', type=int, default=[1]) # val
 parser.add_argument("-pStart", help="Parameter Start Index", type=int, default=0)
 parser.add_argument("-pEnd", help="Parameter End Index", type=int, default=40)

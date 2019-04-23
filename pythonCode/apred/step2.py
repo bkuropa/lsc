@@ -65,6 +65,7 @@ parser.add_argument("-finMark", help="finMark", type=str, default="finished")
 parser.add_argument("-epochs", help="Nr. Epochs", type=int, default=300)
 parser.add_argument("-noOpt", help="no hyperparam optimization", action='store_true')
 parser.add_argument("-valBasePath", help="separate val save path for reusing best hyperparams", type=str)
+parser.add_argument("-numValFolds", help="Nr. Val Folds", type=int, default=3)
 args = parser.parse_args()
 
 
@@ -223,8 +224,8 @@ for outerFold in compOuterFolds:
       if len(index) == 1:
         index = '0' + index
       val_aucs = []
-      for val_idx in range(3):
-        with open(os.path.join(valSavePath, '../..', 'fold_' + str(val_idx), 'semi', 'dbg', 'o0003_i0002_p00' + index + '.dbg'), 'r') as f:
+      for val_idx in range(args.numValFolds):
+        with open(os.path.join(args.valBasePath, str(val_idx), 'semi', 'dbg', 'o0002_i0002_p00' + index + '.dbg'), 'r') as f:
           last_line = None
           for line in f:
             if len(line.strip()) > 0:
