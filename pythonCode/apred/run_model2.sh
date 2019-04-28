@@ -9,8 +9,8 @@ gpu=$6
 num_test_folds=$7
 val_folds_per_test=$8
 time_split=$9
-val_epochs='300'
-test_epochs='300'
+val_epochs=${10}
+test_epochs=${11}
 
 regression=""
 if [ "$dataset_type" == "regression" ]
