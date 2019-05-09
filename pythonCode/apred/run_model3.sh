@@ -34,12 +34,12 @@ source activate $tfenv
 # echo "step1"
 # for ((j=0;j<num_test_folds;j++)); do
 #     for ((k=0;k<val_folds_per_test;k++)); do
-#         CUDA_VISIBLE_DEVICES=$gpu python step1.py -maxProc 10 -availableGPUs $gpu $regression -batchSize ${batchSize} -metric ${metric} -originalData ../../../scripts/lsc_data/${dataset}/ -dataset semi -saveBasePath ../../../compare_lsc_random/${dataset}/val/fold_$j/$k/ -dataPathFolds ../../../data/${dataset}/random/fold_$j/$k/split_indices.pckl -epochs $val_epochs
+#         CUDA_VISIBLE_DEVICES=$gpu python step1.py -maxProc 5 -availableGPUs $gpu $regression -batchSize ${batchSize} -metric ${metric} -originalData ../../../scripts/lsc_data/${dataset}/ -dataset semi -saveBasePath ../../../compare_lsc_random/${dataset}/val/fold_$j/$k/ -dataPathFolds ../../../data/${dataset}/random/fold_$j/$k/split_indices.pckl -epochs $val_epochs
 #     done
 # done
 # echo "step2" # just use 0th fold for testing; it's just selecting the val set
 # for ((j=0;j<num_test_folds;j++)); do
-#     CUDA_VISIBLE_DEVICES=$gpu python step2.py -maxProc 10 -availableGPUs $gpu $regression -batchSize ${batchSize} -metric ${metric} -originalData ../../../scripts/lsc_data/${dataset}/ -dataset semi -saveBasePath ../../../compare_lsc_random/${dataset}/test/fold_$j/ -dataPathFolds ../../../data/${dataset}/random/fold_$j/0/split_indices.pckl -epochs $test_epochs -valBasePath ../../../compare_lsc_random/${dataset}/val/fold_$j/ -numValFolds $val_folds_per_test
+#     CUDA_VISIBLE_DEVICES=$gpu python step2.py -maxProc 5 -availableGPUs $gpu $regression -batchSize ${batchSize} -metric ${metric} -originalData ../../../scripts/lsc_data/${dataset}/ -dataset semi -saveBasePath ../../../compare_lsc_random/${dataset}/test/fold_$j/ -dataPathFolds ../../../data/${dataset}/random/fold_$j/0/split_indices.pckl -epochs $test_epochs -valBasePath ../../../compare_lsc_random/${dataset}/val/fold_$j/ -numValFolds $val_folds_per_test
 # done
 
 if [ "$time_split" == "true" ]
@@ -62,15 +62,15 @@ then
     done
     echo "step1"
     for ((j=0;j<num_test_folds;j++)); do
-        CUDA_VISIBLE_DEVICES=$gpu python step1.py -maxProc 10 -availableGPUs $gpu $regression -batchSize ${batchSize} -metric ${metric} -originalData ../../../scripts/lsc_data/${dataset}/ -dataset semi -saveBasePath ../../../compare_lsc_time_window/random/${dataset}/val/fold_$j/0/ -dataPathFolds ../../../data/${dataset}/time_window/random/fold_$j/0/split_indices.pckl -epochs $val_epochs
-        CUDA_VISIBLE_DEVICES=$gpu python step1.py -maxProc 10 -availableGPUs $gpu $regression -batchSize ${batchSize} -metric ${metric} -originalData ../../../scripts/lsc_data/${dataset}/ -dataset semi -saveBasePath ../../../compare_lsc_time_window/scaffold/${dataset}/val/fold_$j/0/ -dataPathFolds ../../../data/${dataset}/time_window/scaffold/fold_$j/0/split_indices.pckl -epochs $val_epochs
-        CUDA_VISIBLE_DEVICES=$gpu python step1.py -maxProc 10 -availableGPUs $gpu $regression -batchSize ${batchSize} -metric ${metric} -originalData ../../../scripts/lsc_data/${dataset}/ -dataset semi -saveBasePath ../../../compare_lsc_time_window/time/${dataset}/val/fold_$j/0/ -dataPathFolds ../../../data/${dataset}/time_window/time/fold_$j/0/split_indices.pckl -epochs $val_epochs
+        CUDA_VISIBLE_DEVICES=$gpu python step1.py -maxProc 5 -availableGPUs $gpu $regression -batchSize ${batchSize} -metric ${metric} -originalData ../../../scripts/lsc_data/${dataset}/ -dataset semi -saveBasePath ../../../compare_lsc_time_window/random/${dataset}/val/fold_$j/0/ -dataPathFolds ../../../data/${dataset}/time_window/random/fold_$j/0/split_indices.pckl -epochs $val_epochs
+        CUDA_VISIBLE_DEVICES=$gpu python step1.py -maxProc 5 -availableGPUs $gpu $regression -batchSize ${batchSize} -metric ${metric} -originalData ../../../scripts/lsc_data/${dataset}/ -dataset semi -saveBasePath ../../../compare_lsc_time_window/scaffold/${dataset}/val/fold_$j/0/ -dataPathFolds ../../../data/${dataset}/time_window/scaffold/fold_$j/0/split_indices.pckl -epochs $val_epochs
+        CUDA_VISIBLE_DEVICES=$gpu python step1.py -maxProc 5 -availableGPUs $gpu $regression -batchSize ${batchSize} -metric ${metric} -originalData ../../../scripts/lsc_data/${dataset}/ -dataset semi -saveBasePath ../../../compare_lsc_time_window/time/${dataset}/val/fold_$j/0/ -dataPathFolds ../../../data/${dataset}/time_window/time/fold_$j/0/split_indices.pckl -epochs $val_epochs
     done
     echo "step2" # just use 0th fold for testing; it's just selecting the val set
     for ((j=0;j<num_test_folds;j++)); do
-        CUDA_VISIBLE_DEVICES=$gpu python step2.py -maxProc 10 -availableGPUs $gpu $regression -batchSize ${batchSize} -metric ${metric} -originalData ../../../scripts/lsc_data/${dataset}/ -dataset semi -saveBasePath ../../../compare_lsc_time_window/random/${dataset}/test/fold_$j/0/ -dataPathFolds ../../../data/${dataset}/time_window/random/fold_$j/0/split_indices.pckl -epochs $test_epochs -valBasePath ../../../compare_lsc_time_window/random/${dataset}/val/fold_$j/ -numValFolds 1
-        CUDA_VISIBLE_DEVICES=$gpu python step2.py -maxProc 10 -availableGPUs $gpu $regression -batchSize ${batchSize} -metric ${metric} -originalData ../../../scripts/lsc_data/${dataset}/ -dataset semi -saveBasePath ../../../compare_lsc_time_window/scaffold/${dataset}/test/fold_$j/0/ -dataPathFolds ../../../data/${dataset}/time_window/scaffold/fold_$j/0/split_indices.pckl -epochs $test_epochs -valBasePath ../../../compare_lsc_time_window/scaffold/${dataset}/val/fold_$j/ -numValFolds 1
-        CUDA_VISIBLE_DEVICES=$gpu python step2.py -maxProc 10 -availableGPUs $gpu $regression -batchSize ${batchSize} -metric ${metric} -originalData ../../../scripts/lsc_data/${dataset}/ -dataset semi -saveBasePath ../../../compare_lsc_time_window/time/${dataset}/test/fold_$j/0/ -dataPathFolds ../../../data/${dataset}/time_window/time/fold_$j/0/split_indices.pckl -epochs $test_epochs -valBasePath ../../../compare_lsc_time_window/time/${dataset}/val/fold_$j/ -numValFolds 1
+        CUDA_VISIBLE_DEVICES=$gpu python step2.py -maxProc 5 -availableGPUs $gpu $regression -batchSize ${batchSize} -metric ${metric} -originalData ../../../scripts/lsc_data/${dataset}/ -dataset semi -saveBasePath ../../../compare_lsc_time_window/random/${dataset}/test/fold_$j/0/ -dataPathFolds ../../../data/${dataset}/time_window/random/fold_$j/0/split_indices.pckl -epochs $test_epochs -valBasePath ../../../compare_lsc_time_window/random/${dataset}/val/fold_$j/ -numValFolds 1
+        CUDA_VISIBLE_DEVICES=$gpu python step2.py -maxProc 5 -availableGPUs $gpu $regression -batchSize ${batchSize} -metric ${metric} -originalData ../../../scripts/lsc_data/${dataset}/ -dataset semi -saveBasePath ../../../compare_lsc_time_window/scaffold/${dataset}/test/fold_$j/0/ -dataPathFolds ../../../data/${dataset}/time_window/scaffold/fold_$j/0/split_indices.pckl -epochs $test_epochs -valBasePath ../../../compare_lsc_time_window/scaffold/${dataset}/val/fold_$j/ -numValFolds 1
+        CUDA_VISIBLE_DEVICES=$gpu python step2.py -maxProc 5 -availableGPUs $gpu $regression -batchSize ${batchSize} -metric ${metric} -originalData ../../../scripts/lsc_data/${dataset}/ -dataset semi -saveBasePath ../../../compare_lsc_time_window/time/${dataset}/test/fold_$j/0/ -dataPathFolds ../../../data/${dataset}/time_window/time/fold_$j/0/split_indices.pckl -epochs $test_epochs -valBasePath ../../../compare_lsc_time_window/time/${dataset}/val/fold_$j/ -numValFolds 1
     done
 
     echo "time split"
@@ -81,10 +81,10 @@ then
     mkdir -p ../../../compare_lsc_time/${dataset}/val/fold_0/0/semi
     cp ../../../compare_lsc_time/${dataset}/val/fold_base/semi/* ../../../compare_lsc_time/${dataset}/val/fold_0/0/semi/
     echo "step1" # no loop for time since it's just one split
-    CUDA_VISIBLE_DEVICES=$gpu python step1.py -maxProc 10 -availableGPUs $gpu $regression -batchSize ${batchSize} -metric ${metric} -originalData ../../../scripts/lsc_data/${dataset}/ -dataset semi -saveBasePath ../../../compare_lsc_time/${dataset}/val/fold_0/0/ -dataPathFolds ../../../data/${dataset}/time/fold_0/0/split_indices.pckl -epochs $val_epochs
+    CUDA_VISIBLE_DEVICES=$gpu python step1.py -maxProc 5 -availableGPUs $gpu $regression -batchSize ${batchSize} -metric ${metric} -originalData ../../../scripts/lsc_data/${dataset}/ -dataset semi -saveBasePath ../../../compare_lsc_time/${dataset}/val/fold_0/0/ -dataPathFolds ../../../data/${dataset}/time/fold_0/0/split_indices.pckl -epochs $val_epochs
     echo "step2"
     for ((j=0;j<num_test_folds;j++)); do
-        CUDA_VISIBLE_DEVICES=$gpu python step2.py -maxProc 10 -availableGPUs $gpu $regression -batchSize ${batchSize} -metric ${metric} -originalData ../../../scripts/lsc_data/${dataset}/ -dataset semi -saveBasePath ../../../compare_lsc_time/${dataset}/test/fold_$j/ -dataPathFolds ../../../data/${dataset}/time/fold_$j/0/split_indices.pckl -epochs $test_epochs -valBasePath ../../../compare_lsc_time/${dataset}/val/fold_0/ -numValFolds 1
+        CUDA_VISIBLE_DEVICES=$gpu python step2.py -maxProc 5 -availableGPUs $gpu $regression -batchSize ${batchSize} -metric ${metric} -originalData ../../../scripts/lsc_data/${dataset}/ -dataset semi -saveBasePath ../../../compare_lsc_time/${dataset}/test/fold_$j/ -dataPathFolds ../../../data/${dataset}/time/fold_$j/0/split_indices.pckl -epochs $test_epochs -valBasePath ../../../compare_lsc_time/${dataset}/val/fold_0/ -numValFolds 1
     done
 fi
 
@@ -102,12 +102,12 @@ done
 echo "step1"
 for ((j=0;j<num_test_folds;j++)); do
     for ((k=0;k<val_folds_per_test;k++)); do
-        CUDA_VISIBLE_DEVICES=$gpu python step1.py -maxProc 10 -availableGPUs $gpu $regression -batchSize ${batchSize} -metric ${metric} -originalData ../../../scripts/lsc_data/${dataset}/ -dataset semi -saveBasePath ../../../compare_lsc_scaffold/${dataset}/val/fold_$j/$k/ -dataPathFolds ../../../data/${dataset}/scaffold/fold_$j/$k/split_indices.pckl -epochs $val_epochs
+        CUDA_VISIBLE_DEVICES=$gpu python step1.py -maxProc 5 -availableGPUs $gpu $regression -batchSize ${batchSize} -metric ${metric} -originalData ../../../scripts/lsc_data/${dataset}/ -dataset semi -saveBasePath ../../../compare_lsc_scaffold/${dataset}/val/fold_$j/$k/ -dataPathFolds ../../../data/${dataset}/scaffold/fold_$j/$k/split_indices.pckl -epochs $val_epochs
     done
 done
 echo "step2"
 for ((j=0;j<num_test_folds;j++)); do
-    CUDA_VISIBLE_DEVICES=$gpu python step2.py -maxProc 10 -availableGPUs $gpu $regression -batchSize ${batchSize} -metric ${metric} -originalData ../../../scripts/lsc_data/${dataset}/ -dataset semi -saveBasePath ../../../compare_lsc_scaffold/${dataset}/test/fold_$j/ -dataPathFolds ../../../data/${dataset}/scaffold/fold_$j/0/split_indices.pckl -epochs $test_epochs -valBasePath ../../../compare_lsc_scaffold/${dataset}/val/fold_$j/ -numValFolds $val_folds_per_test
+    CUDA_VISIBLE_DEVICES=$gpu python step2.py -maxProc 5 -availableGPUs $gpu $regression -batchSize ${batchSize} -metric ${metric} -originalData ../../../scripts/lsc_data/${dataset}/ -dataset semi -saveBasePath ../../../compare_lsc_scaffold/${dataset}/test/fold_$j/ -dataPathFolds ../../../data/${dataset}/scaffold/fold_$j/0/split_indices.pckl -epochs $test_epochs -valBasePath ../../../compare_lsc_scaffold/${dataset}/val/fold_$j/ -numValFolds $val_folds_per_test
 done
 
 source deactivate
