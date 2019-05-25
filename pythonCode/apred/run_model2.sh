@@ -20,27 +20,27 @@ fi
 
 source activate $tfenv
 
-# echo "random split"
-# python estGPUSize.py -availableGPU $gpu $regression -batchSize $batchSize -metric ${metric} -originalData ../../../scripts/lsc_data/${dataset}/ -dataset semi -saveBasePath ../../../compare_lsc_random/${dataset}/val/fold_base/ -dataPathFolds ../../../data/${dataset}/random/fold_0/0/split_indices.pckl
-# rm ../../../compare_lsc_random/${dataset}/val/fold_base/semi/o0003.start.pckl
-# for ((j=0;j<num_test_folds;j++)); do
-#     for ((k=0;k<val_folds_per_test;k++)); do
-#         rm -r ../../../compare_lsc_random/${dataset}/val/fold_$j/$k/
-#         # cp -r ../../../compare_lsc_random/${dataset}/val/fold_base ../../../compare_lsc_random/${dataset}/val/fold_$j/$k/
-#         mkdir -p ../../../compare_lsc_random/${dataset}/val/fold_$j/$k/semi
-#         cp ../../../compare_lsc_random/${dataset}/val/fold_base/semi/* ../../../compare_lsc_random/${dataset}/val/fold_$j/$k/semi/
-#     done
-# done
-# echo "step1"
-# for ((j=0;j<num_test_folds;j++)); do
-#     for ((k=0;k<val_folds_per_test;k++)); do
-#         CUDA_VISIBLE_DEVICES=$gpu python step1.py -maxProc 10 -availableGPUs $gpu $regression -batchSize ${batchSize} -metric ${metric} -originalData ../../../scripts/lsc_data/${dataset}/ -dataset semi -saveBasePath ../../../compare_lsc_random/${dataset}/val/fold_$j/$k/ -dataPathFolds ../../../data/${dataset}/random/fold_$j/$k/split_indices.pckl -epochs $val_epochs
-#     done
-# done
-# echo "step2" # just use 0th fold for testing; it's just selecting the val set
-# for ((j=0;j<num_test_folds;j++)); do
-#     CUDA_VISIBLE_DEVICES=$gpu python step2.py -maxProc 10 -availableGPUs $gpu $regression -batchSize ${batchSize} -metric ${metric} -originalData ../../../scripts/lsc_data/${dataset}/ -dataset semi -saveBasePath ../../../compare_lsc_random/${dataset}/test/fold_$j/ -dataPathFolds ../../../data/${dataset}/random/fold_$j/0/split_indices.pckl -epochs $test_epochs -valBasePath ../../../compare_lsc_random/${dataset}/val/fold_$j/ -numValFolds $val_folds_per_test
-# done
+echo "random split"
+python estGPUSize.py -availableGPU $gpu $regression -batchSize $batchSize -metric ${metric} -originalData ../../../scripts/lsc_data/${dataset}/ -dataset semi -saveBasePath ../../../compare_lsc_random/${dataset}/val/fold_base/ -dataPathFolds ../../../data/${dataset}/random/fold_0/0/split_indices.pckl
+rm ../../../compare_lsc_random/${dataset}/val/fold_base/semi/o0003.start.pckl
+for ((j=0;j<num_test_folds;j++)); do
+    for ((k=0;k<val_folds_per_test;k++)); do
+        rm -r ../../../compare_lsc_random/${dataset}/val/fold_$j/$k/
+        # cp -r ../../../compare_lsc_random/${dataset}/val/fold_base ../../../compare_lsc_random/${dataset}/val/fold_$j/$k/
+        mkdir -p ../../../compare_lsc_random/${dataset}/val/fold_$j/$k/semi
+        cp ../../../compare_lsc_random/${dataset}/val/fold_base/semi/* ../../../compare_lsc_random/${dataset}/val/fold_$j/$k/semi/
+    done
+done
+echo "step1"
+for ((j=0;j<num_test_folds;j++)); do
+    for ((k=0;k<val_folds_per_test;k++)); do
+        CUDA_VISIBLE_DEVICES=$gpu python step1.py -maxProc 10 -availableGPUs $gpu $regression -batchSize ${batchSize} -metric ${metric} -originalData ../../../scripts/lsc_data/${dataset}/ -dataset semi -saveBasePath ../../../compare_lsc_random/${dataset}/val/fold_$j/$k/ -dataPathFolds ../../../data/${dataset}/random/fold_$j/$k/split_indices.pckl -epochs $val_epochs
+    done
+done
+echo "step2" # just use 0th fold for testing; it's just selecting the val set
+for ((j=0;j<num_test_folds;j++)); do
+    CUDA_VISIBLE_DEVICES=$gpu python step2.py -maxProc 10 -availableGPUs $gpu $regression -batchSize ${batchSize} -metric ${metric} -originalData ../../../scripts/lsc_data/${dataset}/ -dataset semi -saveBasePath ../../../compare_lsc_random/${dataset}/test/fold_$j/ -dataPathFolds ../../../data/${dataset}/random/fold_$j/0/split_indices.pckl -epochs $test_epochs -valBasePath ../../../compare_lsc_random/${dataset}/val/fold_$j/ -numValFolds $val_folds_per_test
+done
 
 if [ "$time_split" == "true" ]
 then
